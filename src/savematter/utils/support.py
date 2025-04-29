@@ -8,6 +8,8 @@ from savematter.utils.settings import TYPE_CHECKING, pygame
 if TYPE_CHECKING:
     from pygame import Surface
 
+_surf_cache = {}
+
 
 def import_image(*path: str, alpha: bool = True, format: str = "png") -> Surface:
     full_path: str = join(*path) + f".{format}"

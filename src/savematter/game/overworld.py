@@ -23,7 +23,7 @@ class Overworld:
         data: Data,
         overworld_frames: dict[
             str,
-            Surface | list[Surface] | dict[str, Surface | list[Surface]],
+            Surface | list[Surface] | dict[str, Surface] | dict[str, list[Surface]],
         ],
         switch_stage: Callable[[str, int], None],
     ) -> None:
@@ -49,7 +49,7 @@ class Overworld:
         tmx_map: TiledMap,
         overworld_frames: dict[
             str,
-            Surface | list[Surface] | dict[str, Surface | list[Surface]],
+            Surface | list[Surface] | dict[str, Surface] | dict[str, list[Surface]],
         ],
     ) -> None:
         # Tiles

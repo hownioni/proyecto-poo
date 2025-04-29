@@ -37,7 +37,7 @@ class Level:
         data: Data,
         level_frames: dict[
             str,
-            Surface | list[Surface] | dict[str, Surface | list[Surface]],
+            Surface | list[Surface] | dict[str, Surface] | dict[str, list[Surface]],
         ],
         audio_files: dict[str, Sound],
         switch_stage: Callable[[str, int], None],
@@ -98,7 +98,7 @@ class Level:
         tmx_map: TiledMap,
         level_frames: dict[
             str,
-            Surface | list[Surface] | dict[str, Surface | list[Surface]],
+            Surface | list[Surface] | dict[str, Surface] | dict[str, list[Surface]],
         ],
         audio_files: dict[str, Sound],
     ) -> None:

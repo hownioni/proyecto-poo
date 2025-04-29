@@ -16,15 +16,15 @@ if TYPE_CHECKING:
 class UI:
     def __init__(
         self,
-        font: Font,
+        fonts: dict[str, Font],
         frames: dict[
             str,
-            Surface | list[Surface] | dict[str, Surface | list[Surface]],
+            Surface | list[Surface] | dict[str, Surface] | dict[str, list[Surface]],
         ],
     ) -> None:
         self.display_surf = pygame.display.get_surface()
         self.sprites = pygame.sprite.Group()
-        self.font = font
+        self.fonts = fonts
 
         # Health / Hearts
         self.heart_frames = cast("list[Surface]", frames["heart"])
@@ -52,7 +52,9 @@ class UI:
             raise TypeError("Display surface is empty")
 
         if self.coin_timer.active:
-            text_surf = self.font.render(str(self.coin_amount), False, "#33323d")
+            text_surf = self.fonts["main"].render(
+                str(self.coin_amount), False, "#33323d"
+            )
             text_rect = text_surf.get_frect(topleft=(16, 34))
             self.display_surf.blit(text_surf, text_rect)
 
