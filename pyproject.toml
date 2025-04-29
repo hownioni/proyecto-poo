@@ -1,0 +1,24 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+
+requires = [ "setuptools>=70.0.3" ]
+
+[project]
+name = "save-the-matter"
+version = "0.1.0"
+description = "Proyecto para la materia de Programación Orientada a Objetos"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+]
+#scripts.my_game = "my_game.main:main" # Makes the game runnable via CLI
+dependencies = [
+  "pygame-ce",
+  "pytmx @ git+https://github.com/bitcraft/pytmx",
+]
