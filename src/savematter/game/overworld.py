@@ -1,19 +1,26 @@
 from __future__ import annotations
 
-from collections.abc import Callable
 from random import randint
-from typing import TYPE_CHECKING, cast
+from typing import cast
 
-from savematter.sprites.overworld import Node, Path, PlayerIcon
+from savematter.sprites.overworld import Node, PlayerIcon, WalkPath
 from savematter.sprites.sprites import AnimatedSprite, Sprite
 from savematter.utils.groups import WorldSprites
-from savematter.utils.settings import TILE_SIZE, Z_LAYERS, Vector2, pygame
+from savematter.utils.settings import (
+    TILE_SIZE,
+    TYPE_CHECKING,
+    Z_LAYERS,
+    GameState,
+    Vector2,
+    pygame,
+)
 
 if TYPE_CHECKING:
     from pygame import Surface
     from pytmx.pytmx import TiledMap, TiledObject, TiledObjectGroup
 
     from savematter.game.data import Data
+    from savematter.utils.typing import SwitchState
 
 
 class Overworld:
@@ -25,11 +32,11 @@ class Overworld:
             str,
             Surface | list[Surface] | dict[str, Surface] | dict[str, list[Surface]],
         ],
-        switch_stage: Callable[[str, int], None],
+        switch_state: SwitchState,
     ) -> None:
         self.screen: Surface | None = pygame.display.get_surface()
         self.data = data
-        self.switch_stage = switch_stage
+        self.switch_state = switch_state
 
         # Groups
         self.all_sprites = WorldSprites(self.data)
@@ -204,7 +211,7 @@ class Overworld:
                     else:
                         surf = self.path_surfs["horizontal"]
 
-                    Path(
+                    WalkPath(
                         (tile.x * TILE_SIZE, tile.y * TILE_SIZE),
                         surf,
                         key,
@@ -232,7 +239,7 @@ class Overworld:
                 self.move("right")
             if keys[pygame.K_z] or keys[pygame.K_RETURN]:
                 self.data.current_level = self.current_node.level
-                self.switch_stage("level", 0)
+                self.switch_state(GameState.LEVEL)
 
     def move(self, dir: str) -> None:
         dir_key = int(self.current_node.dirs[dir][0])

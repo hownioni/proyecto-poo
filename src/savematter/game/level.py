@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections.abc import Callable
 from random import uniform
 from typing import cast
 
@@ -21,6 +20,7 @@ from savematter.utils.settings import (
     TILE_SIZE,
     TYPE_CHECKING,
     Z_LAYERS,
+    GameState,
     pygame,
 )
 
@@ -28,6 +28,8 @@ if TYPE_CHECKING:
     from pygame import Surface
     from pygame.mixer import Sound
     from pytmx.pytmx import TiledMap, TiledObject, TiledObjectGroup
+
+    from savematter.utils.typing import SwitchState
 
 
 class Level:
@@ -40,11 +42,11 @@ class Level:
             Surface | list[Surface] | dict[str, Surface] | dict[str, list[Surface]],
         ],
         audio_files: dict[str, Sound],
-        switch_stage: Callable[[str, int], None],
+        switch_state: SwitchState,
     ) -> None:
         self.screen: Surface | None = pygame.display.get_surface()
         self.data = data
-        self.switch_stage = switch_stage
+        self.switch_state = switch_state
 
         # Level data
         self.level_width = tmx_map.width * TILE_SIZE
@@ -501,11 +503,11 @@ class Level:
 
         # Bottom
         if self.player.hitbox.bottom > self.level_height:
-            self.switch_stage("overworld", -1)
+            self.switch_state(GameState.OVERWORLD, -1)
 
         # Flag
         if self.player.hitbox.colliderect(self.level_finish_rect):
-            self.switch_stage("overworld", self.level_unlock)
+            self.switch_state(GameState.OVERWORLD, self.level_unlock)
 
     def run(self, dt: float) -> None:
         if self.screen is None:

@@ -2,11 +2,10 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from random import choice
-from typing import TYPE_CHECKING
 
 from savematter.game.player import Player
 from savematter.sprites.sprites import AnimatedSprite, Sprite, StateAnimatedSprite
-from savematter.utils.settings import Vector2, pygame
+from savematter.utils.settings import TYPE_CHECKING, Vector2, pygame
 from savematter.utils.timer import Timer
 
 if TYPE_CHECKING:

@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from savematter.sprites.sprites import Sprite, StateAnimatedSprite
-from savematter.utils.settings import TILE_SIZE, Z_LAYERS, Vector2
+from savematter.utils.settings import TILE_SIZE, TYPE_CHECKING, Z_LAYERS, Vector2
 
 if TYPE_CHECKING:
     from pygame import Surface
@@ -141,7 +139,7 @@ class PlayerIcon(StateAnimatedSprite):
         super().update(dt)
 
 
-class Path(Sprite):
+class WalkPath(Sprite):
     def __init__(
         self,
         pos: tuple[float, float],

@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 from os.path import join
-from typing import TYPE_CHECKING
 
-from savematter.utils.settings import pygame
+from savematter.utils.settings import TYPE_CHECKING, pygame
 from savematter.utils.support import (
     import_folder,
     import_folder_dict,

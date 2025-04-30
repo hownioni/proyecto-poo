@@ -1,4 +1,5 @@
 import sys as sys
+from enum import Enum, auto
 from typing import TYPE_CHECKING as TYPE_CHECKING
 
 import pygame as pygame
@@ -22,3 +23,8 @@ Z_LAYERS = {
     "fg": 7,
     "ui": 8,
 }
+
+
+class GameState(Enum):
+    OVERWORLD = auto()
+    LEVEL = auto()
