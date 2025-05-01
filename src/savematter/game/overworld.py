@@ -1,23 +1,23 @@
 from __future__ import annotations
 
 from random import randint
-from typing import cast
+
+import pygame
 
 from savematter.sprites.overworld import Node, PlayerIcon, WalkPath
 from savematter.sprites.sprites import AnimatedSprite, Sprite
 from savematter.utils.groups import WorldSprites
 from savematter.utils.settings import (
     TILE_SIZE,
-    TYPE_CHECKING,
     Z_LAYERS,
     GameState,
-    Vector2,
-    pygame,
 )
+from savematter.utils.typing import TYPE_CHECKING, Vector2, cast
 
 if TYPE_CHECKING:
     from pygame import Surface
-    from pytmx.pytmx import TiledMap, TiledObject, TiledObjectGroup
+    from pytmx.pytmx import TiledMap, TiledObject
+    from pytmx.pytmx import TiledObjectGroup as TiledObjectGroup
 
     from savematter.game.data import Data
     from savematter.utils.typing import SwitchState

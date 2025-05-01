@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from random import uniform
-from typing import cast
+
+import pygame
 
 from savematter.game.data import Data
 from savematter.game.player import Player
@@ -18,16 +19,16 @@ from savematter.utils.groups import AllSprites
 from savematter.utils.settings import (
     ANIM_SPEED,
     TILE_SIZE,
-    TYPE_CHECKING,
     Z_LAYERS,
     GameState,
-    pygame,
 )
+from savematter.utils.typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:
     from pygame import Surface
     from pygame.mixer import Sound
-    from pytmx.pytmx import TiledMap, TiledObject, TiledObjectGroup
+    from pytmx.pytmx import TiledMap, TiledObject
+    from pytmx.pytmx import TiledObjectGroup as TiledObjectGroup
 
     from savematter.utils.typing import SwitchState
 

@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from random import randint
-from typing import cast
 
 from pygame.time import get_ticks
+
+from savematter.utils.typing import cast
 
 
 class Timer:

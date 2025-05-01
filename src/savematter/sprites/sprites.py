@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
+import pygame
+
 from savematter.utils.settings import (
     ANIM_SPEED,
     TILE_SIZE,
-    TYPE_CHECKING,
     Z_LAYERS,
-    Vector2,
-    pygame,
 )
+from savematter.utils.typing import TYPE_CHECKING, Vector2
 
 if TYPE_CHECKING:
     from pygame import Surface

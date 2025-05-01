@@ -17,8 +17,18 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
 ]
-#scripts.my_game = "my_game.main:main" # Makes the game runnable via CLI
 dependencies = [
   "pygame-ce",
   "pytmx @ git+https://github.com/bitcraft/pytmx",
 ]
+
+scripts.savematter = "savematter.main:main" # Makes the game runnable via CLI
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = [ "src" ]
+
+[tool.setuptools.package-data]
+savematter = [ "assets/**/*" ]

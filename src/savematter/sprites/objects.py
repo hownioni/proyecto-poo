@@ -3,8 +3,11 @@ from __future__ import annotations
 from math import cos, radians, sin
 from random import randint
 
+import pygame
+
 from savematter.sprites.sprites import AnimatedSprite, Sprite
-from savematter.utils.settings import TILE_SIZE, TYPE_CHECKING, Z_LAYERS, pygame
+from savematter.utils.settings import TILE_SIZE, Z_LAYERS
+from savematter.utils.typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from pygame import Surface

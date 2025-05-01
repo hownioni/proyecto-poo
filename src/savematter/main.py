@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import logging
-from pathlib import Path
+import sys
 
-from pytmx.util_pygame import load_pygame
+import pygame
 
 from savematter.game.data import Data
 from savematter.game.level import Level
@@ -12,20 +12,20 @@ from savematter.game.ui import UI
 from savematter.utils.assets import AssetManager
 from savematter.utils.settings import (
     FPS,
-    TYPE_CHECKING,
     WINDOW_H,
     WINDOW_W,
     GameState,
-    pygame,
-    sys,
 )
+from savematter.utils.typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:
-    from pytmx.pytmx import TiledMap
+    from pytmx.pytmx import TiledMap as TiledMap
 
 
 class Game:
     def __init__(self) -> None:
+        logging.basicConfig(level=logging.DEBUG)
+
         pygame.init()
         self.screen = pygame.display.set_mode((WINDOW_W, WINDOW_H))
         pygame.display.set_caption("Save the Matter!")
@@ -39,33 +39,18 @@ class Game:
         self.overworld_frames = self.assets.overworld_frames
         self.audio_files = self.assets.audio_files
         self.music_files = self.assets.music_files
+        self.tmx_maps = cast("dict[int, TiledMap]", self.assets.tmx_files["maps"])
+        self.tmx_overworld = cast("TiledMap", self.assets.tmx_files["overworld"])
 
         self.ui = UI(self.fonts, self.ui_frames)
         self.data = Data(self.ui)
 
-        self.load_maps()
         self.setup_states()
 
         self.music_files["bg"].play(-1)
 
-    def load_maps(self) -> None:
-        """Load all TMX maps."""
-        self.tmx_maps: dict[int, TiledMap] = {
-            0: load_pygame(str(Path("assets/data/levels/omni.tmx"))),
-            1: load_pygame(str(Path("assets/data/levels/1.tmx"))),
-            2: load_pygame(str(Path("assets/data/levels/2.tmx"))),
-            3: load_pygame(str(Path("assets/data/levels/3.tmx"))),
-            4: load_pygame(str(Path("assets/data/levels/4.tmx"))),
-            5: load_pygame(str(Path("assets/data/levels/5.tmx"))),
-        }
-
-        self.tmx_overworld = load_pygame(
-            str(Path("assets/data/overworld/overworld.tmx"))
-        )
-
     def setup_states(self) -> None:
-        """Initialize game states."""
-        self.current_stage = Level(
+        self.current_state = Level(
             self.tmx_maps[self.data.current_level],
             self.data,
             self.level_frames,
@@ -83,10 +68,13 @@ class Game:
                     If 'None', no level is unlocked.
                     If '-1', penalize the player (e.g., health loss).
         """
+        if unlock is not None:
+            unlock = unlock if unlock >= self.data.unlocked_level else None
+
         logging.debug(f"Switching to {target}, unlock={unlock}")
         match target:
             case GameState.LEVEL:
-                self.current_stage = Level(
+                self.current_state = Level(
                     self.tmx_maps[self.data.current_level],
                     self.data,
                     self.level_frames,
@@ -98,26 +86,28 @@ class Game:
                     self.data.health -= 1
                 elif unlock is not None:
                     self.data.unlocked_level = unlock
-                self.current_stage = Overworld(
+                self.current_state = Overworld(
                     self.tmx_overworld,
                     self.data,
                     self.overworld_frames,
                     self.switch_state,
                 )
 
-    def check_game_over(self) -> None:
-        if self.data.health <= 0:
-            pygame.quit()
-            sys.exit()
-
     def run(self) -> None:
         while True:
             dt = self.clock.tick(FPS) / 1000
+            max_dt = 0.1
+            dt = min(dt, max_dt)
             self.handle_events()
 
             self.check_game_over()
             self.update(dt)
             self.render()
+
+    def check_game_over(self) -> None:
+        if self.data.health <= 0:
+            pygame.quit()
+            sys.exit()
 
     def handle_events(self) -> None:
         for event in pygame.event.get():
@@ -125,14 +115,14 @@ class Game:
                 pygame.quit()
                 sys.exit()
 
+    def update(self, dt: float) -> None:
+        self.current_state.run(dt)
+        self.ui.update(dt)
+
     def render(self) -> None:
         pygame.display.update()
 
-    def update(self, dt: float) -> None:
-        self.current_stage.run(dt)
-        self.ui.update(dt)
 
-
-if __name__ == "__main__":
+def main():
     game = Game()
     game.run()

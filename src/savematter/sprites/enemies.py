@@ -1,16 +1,19 @@
 from __future__ import annotations
 
-from collections.abc import Callable
 from random import choice
+
+import pygame
 
 from savematter.game.player import Player
 from savematter.sprites.sprites import AnimatedSprite, Sprite, StateAnimatedSprite
-from savematter.utils.settings import TYPE_CHECKING, Vector2, pygame
 from savematter.utils.timer import Timer
+from savematter.utils.typing import TYPE_CHECKING, Vector2
 
 if TYPE_CHECKING:
     from pygame import Surface
     from pygame.sprite import Group
+
+    from savematter.utils.typing import Callable
 
 
 class Tooth(AnimatedSprite):

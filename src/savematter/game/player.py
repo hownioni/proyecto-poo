@@ -2,10 +2,12 @@ from __future__ import annotations
 
 from math import sin
 
+import pygame
+
 from savematter.game.data import Data
 from savematter.sprites.sprites import StateAnimatedSprite
-from savematter.utils.settings import TYPE_CHECKING, Vector2, pygame
 from savematter.utils.timer import Timer
+from savematter.utils.typing import TYPE_CHECKING, Vector2
 
 if TYPE_CHECKING:
     from pygame.mixer import Sound

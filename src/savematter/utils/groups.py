@@ -1,20 +1,19 @@
 from __future__ import annotations
 
 from random import choice, randint
-from typing import cast
+
+import pygame
 
 from savematter.sprites.objects import Cloud
 from savematter.sprites.sprites import Sprite
 from savematter.utils.settings import (
     TILE_SIZE,
-    TYPE_CHECKING,
     WINDOW_H,
     WINDOW_W,
     Z_LAYERS,
-    Vector2,
-    pygame,
 )
 from savematter.utils.timer import Timer
+from savematter.utils.typing import TYPE_CHECKING, Vector2, cast
 
 if TYPE_CHECKING:
     from pygame import Surface

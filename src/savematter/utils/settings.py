@@ -1,10 +1,4 @@
-import sys as sys
 from enum import Enum, auto
-from typing import TYPE_CHECKING as TYPE_CHECKING
-
-import pygame as pygame
-import pytmx as pytmx
-from pygame.math import Vector2 as Vector2
 
 WINDOW_W, WINDOW_H = 1280, 720
 TILE_SIZE = 64

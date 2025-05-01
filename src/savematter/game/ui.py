@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from typing import cast
+import pygame
 
 from savematter.sprites.sprites import AnimatedSprite
-from savematter.utils.settings import TYPE_CHECKING, Z_LAYERS, pygame
+from savematter.utils.settings import Z_LAYERS
 from savematter.utils.timer import Timer
+from savematter.utils.typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:
     from pygame import Surface
