@@ -47,6 +47,7 @@ class Game:
 
         self.setup_states()
 
+        self.music_files["bg"].set_volume(0.5)
         self.music_files["bg"].play(-1)
 
     def setup_states(self) -> None:
@@ -126,3 +127,6 @@ class Game:
 def main():
     game = Game()
     game.run()
+
+
+main()

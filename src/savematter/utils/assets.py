@@ -93,7 +93,6 @@ class AssetManager:
             "pearl": import_audio("effects", "pearl"),
         }
         self.music_files = {"bg": import_audio("music", "starlight_city", suffix="mp3")}
-        self.music_files["bg"].set_volume(0.5)
 
         tmx_maps: dict[int, TiledMap] = {
             0: import_tmx("data", "levels", "omni"),

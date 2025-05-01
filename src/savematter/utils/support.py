@@ -28,14 +28,11 @@ def _get_asset(*path_parts: str, suffix: str | None = None) -> str:
     Returns:
         Absolute path as a string.
     """
-    path = files("savematter.assets").joinpath(*path_parts)
-    path = str(path)
-    if suffix:
-        if "." in path_parts[-1]:
-            path = path[: path.rfind(".")]
-        path = f"{path}.{suffix}"
-
-    return path
+    path = str(files("savematter.assets").joinpath(*path_parts))
+    try:
+        return f"{path}.{suffix}" if suffix else path
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Asset not found: {path}")
 
 
 def _walk_assets(*path_parts: str) -> Iterator[tuple[str, list[str], list[str]]]:
