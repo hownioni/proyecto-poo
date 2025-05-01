@@ -9,8 +9,8 @@ from savematter.sprites.sprites import AnimatedSprite, Sprite
 from savematter.utils.groups import WorldSprites
 from savematter.utils.settings import (
     TILE_SIZE,
-    Z_LAYERS,
     GameState,
+    ZLayers,
 )
 from savematter.utils.typing import TYPE_CHECKING, Vector2, cast
 
@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from pytmx.pytmx import TiledObjectGroup as TiledObjectGroup
 
     from savematter.game.data import Data
-    from savematter.utils.typing import SwitchState
+    from savematter.utils.typing import AnimationDict, FrameList, SwitchState
 
 
 class Overworld:
@@ -29,12 +29,11 @@ class Overworld:
         tmx_map: TiledMap,
         data: Data,
         overworld_frames: dict[
-            str,
-            Surface | list[Surface] | dict[str, Surface] | dict[str, list[Surface]],
+            str, Surface | FrameList | dict[str, Surface] | AnimationDict
         ],
         switch_state: SwitchState,
     ) -> None:
-        self.screen: Surface | None = pygame.display.get_surface()
+        self.screen = pygame.display.get_surface()
         self.data = data
         self.switch_state = switch_state
 
@@ -56,7 +55,7 @@ class Overworld:
         tmx_map: TiledMap,
         overworld_frames: dict[
             str,
-            Surface | list[Surface] | dict[str, Surface] | dict[str, list[Surface]],
+            Surface | FrameList | dict[str, Surface] | AnimationDict,
         ],
     ) -> None:
         # Tiles
@@ -66,7 +65,7 @@ class Overworld:
                     (x * TILE_SIZE, y * TILE_SIZE),
                     surf,
                     self.all_sprites,
-                    z=Z_LAYERS["bg tiles"],
+                    z=ZLayers.BG_TILES,
                 )
 
         # Water
@@ -74,9 +73,9 @@ class Overworld:
             for row in range(tmx_map.height):
                 AnimatedSprite(
                     (col * TILE_SIZE, row * TILE_SIZE),
-                    cast("list[Surface]", overworld_frames["water"]),
+                    cast("FrameList", overworld_frames["water"]),
                     self.all_sprites,
-                    z=Z_LAYERS["bg"],
+                    z=ZLayers.BG,
                 )
 
         # Objects
@@ -89,18 +88,16 @@ class Overworld:
                 case "palm":
                     AnimatedSprite(
                         (obj.x, obj.y),
-                        cast("list[Surface]", overworld_frames["palms"]),
+                        cast("FrameList", overworld_frames["palms"]),
                         self.all_sprites,
-                        z=Z_LAYERS["main"],
+                        z=ZLayers.MAIN,
                         anim_speed=randint(4, 6),
                     )
                 case _:
                     if obj.image is None:
                         raise TypeError("Object image is empty")
 
-                    z = Z_LAYERS[
-                        f"{'bg details' if obj.name == 'grass' else 'bg tiles'}"
-                    ]
+                    z = ZLayers.BG_DETAILS if obj.name == "grass" else ZLayers.BG_TILES
                     Sprite((obj.x, obj.y), obj.image, self.all_sprites, z=z)
 
         # Paths
@@ -122,7 +119,7 @@ class Overworld:
                         self.player_icon = PlayerIcon(
                             (obj.x + TILE_SIZE / 2, obj.y + TILE_SIZE / 2),
                             "idle",
-                            cast("dict[str, list[Surface]]", overworld_frames["icon"]),
+                            cast("AnimationDict", overworld_frames["icon"]),
                             self.all_sprites,
                         )
                     avail_dirs: dict[str, str] = {

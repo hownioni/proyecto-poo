@@ -13,14 +13,14 @@ if TYPE_CHECKING:
     from pygame import Surface
     from pygame.sprite import Group
 
-    from savematter.utils.typing import Callable
+    from savematter.utils.typing import AnimationDict, Callable, FrameList
 
 
 class Tooth(AnimatedSprite):
     def __init__(
         self,
         pos: tuple[float, float],
-        frames: list[Surface],
+        frames: FrameList,
         collision_sprites: Group,
         *groups: Group,
     ) -> None:
@@ -86,7 +86,7 @@ class Shell(StateAnimatedSprite):
     def __init__(
         self,
         pos: tuple[float, float],
-        frames: dict[str, list[Surface]],
+        frames: AnimationDict,
         reverse: bool,
         player: Player,
         create_pearl: Callable[[tuple[float, float], int], None],

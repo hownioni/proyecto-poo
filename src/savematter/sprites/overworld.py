@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from savematter.sprites.sprites import Sprite, StateAnimatedSprite
-from savematter.utils.settings import TILE_SIZE, Z_LAYERS
+from savematter.utils.settings import TILE_SIZE, ZLayers
 from savematter.utils.typing import TYPE_CHECKING, Vector2
 
 if TYPE_CHECKING:
@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from pygame.sprite import Group
 
     from savematter.game.data import Data
+    from savematter.utils.typing import AnimationDict
 
 
 class Node(Sprite):
@@ -21,7 +22,7 @@ class Node(Sprite):
         dirs: dict[str, str],
         *groups: Group,
     ) -> None:
-        super().__init__(pos, surf, *groups, z=Z_LAYERS["path"])
+        super().__init__(pos, surf, *groups, z=ZLayers.PATH)
         if self.rect is None or self.image is None:
             raise TypeError("Sprite rect or image are empty")
 
@@ -46,10 +47,10 @@ class PlayerIcon(StateAnimatedSprite):
         self,
         pos: tuple[float, float],
         default_state: str,
-        frames: dict[str, list[Surface]],
+        frames: AnimationDict,
         *groups: Group,
     ) -> None:
-        super().__init__(pos, default_state, frames, *groups, z=Z_LAYERS["main"])
+        super().__init__(pos, default_state, frames, *groups, z=ZLayers.MAIN)
         if self.rect is None or self.image is None:
             raise TypeError("Sprite rect or image are empty")
 
@@ -148,5 +149,5 @@ class WalkPath(Sprite):
         level: int,
         *groups: Group,
     ) -> None:
-        super().__init__(pos, surf, *groups, z=Z_LAYERS["path"])
+        super().__init__(pos, surf, *groups, z=ZLayers.PATH)
         self.level = level

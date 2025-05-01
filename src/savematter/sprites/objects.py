@@ -6,12 +6,14 @@ from random import randint
 import pygame
 
 from savematter.sprites.sprites import AnimatedSprite, Sprite
-from savematter.utils.settings import TILE_SIZE, Z_LAYERS
+from savematter.utils.settings import TILE_SIZE, ZLayers
 from savematter.utils.typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from pygame import Surface
     from pygame.sprite import Group
+
+    from savematter.utils.typing import FrameList
 
 
 class Spike(Sprite):
@@ -24,7 +26,7 @@ class Spike(Sprite):
         start_angle: float,
         end_angle: float,
         *groups: Group,
-        z: int = Z_LAYERS["main"],
+        z: int = ZLayers.MAIN,
     ) -> None:
         self.center = pos
         self.radius = radius
@@ -61,7 +63,7 @@ class FloorSpike(AnimatedSprite):
     def __init__(
         self,
         pos: tuple[float, float],
-        frames: list[Surface],
+        frames: FrameList,
         inverted: bool,
         *groups: Group,
     ) -> None:
@@ -89,7 +91,7 @@ class Cloud(Sprite):
         surf: Surface = pygame.Surface((TILE_SIZE, TILE_SIZE)),
         *groups: Group,
     ) -> None:
-        super().__init__(pos, surf, *groups, z=Z_LAYERS["clouds"])
+        super().__init__(pos, surf, *groups, z=ZLayers.CLOUDS)
 
         self.speed = randint(50, 120)
         self.direction = -1

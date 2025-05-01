@@ -4,11 +4,7 @@ from abc import ABC, abstractmethod
 
 import pygame
 
-from savematter.utils.settings import (
-    ANIM_SPEED,
-    TILE_SIZE,
-    Z_LAYERS,
-)
+from savematter.utils.settings import ANIM_SPEED, TILE_SIZE, ZLayers
 from savematter.utils.typing import TYPE_CHECKING, Vector2
 
 if TYPE_CHECKING:
@@ -16,6 +12,7 @@ if TYPE_CHECKING:
     from pygame.sprite import Group
 
     from savematter.game.data import Data
+    from savematter.utils.typing import AnimationDict, FrameList
 
 
 class Sprite(pygame.sprite.Sprite):
@@ -24,7 +21,7 @@ class Sprite(pygame.sprite.Sprite):
         pos: tuple[float, float],
         surf: Surface = pygame.Surface((TILE_SIZE, TILE_SIZE)),
         *groups: Group,
-        z: int = Z_LAYERS["main"],
+        z: int = ZLayers.MAIN,
     ) -> None:
         super().__init__(*groups)
         self.image = surf
@@ -39,9 +36,9 @@ class AnimatedSprite(Sprite):
     def __init__(
         self,
         pos: tuple[float, float],
-        frames: list[Surface],
+        frames: FrameList,
         *groups: Group,
-        z: int = Z_LAYERS["main"],
+        z: int = ZLayers.MAIN,
         anim_speed: float = ANIM_SPEED,
     ) -> None:
         self.frames, self.frame_index = frames, 0
@@ -61,9 +58,9 @@ class StateAnimatedSprite(AnimatedSprite, ABC):
         self,
         pos: tuple[float, float],
         default_state: str,
-        frames: dict[str, list[Surface]],
+        frames: AnimationDict,
         *groups: Group,
-        z: int = Z_LAYERS["main"],
+        z: int = ZLayers.MAIN,
         anim_speed: float = ANIM_SPEED,
     ) -> None:
         self.state = default_state
@@ -87,7 +84,7 @@ class Item(AnimatedSprite):
     def __init__(
         self,
         pos: tuple[float, float],
-        frames: list[Surface],
+        frames: FrameList,
         item_type: str,
         data: Data,
         *groups: Group,
@@ -117,7 +114,7 @@ class ParticleEffectSprite(AnimatedSprite):
     def __init__(
         self,
         pos: tuple[float, float],
-        frames: list[Surface],
+        frames: FrameList,
         *groups: Group,
     ) -> None:
         super().__init__(pos, frames, *groups)
@@ -125,7 +122,7 @@ class ParticleEffectSprite(AnimatedSprite):
             raise TypeError("Sprite rect is empty")
 
         self.rect.center = pos
-        self.z = Z_LAYERS["fg"]
+        self.z = ZLayers.FG
 
     def animate(self, dt: float) -> None:
         self.frame_index += self.anim_speed * dt
@@ -138,13 +135,13 @@ class ParticleEffectSprite(AnimatedSprite):
 class MovingSprite(AnimatedSprite):
     def __init__(
         self,
-        frames: list[Surface],
+        frames: FrameList,
         start_pos: tuple[float, float],
         end_pos: tuple[float, float],
         move_dir: str,
         speed: int,
         *groups: Group,
-        z: int = Z_LAYERS["main"],
+        z: int = ZLayers.MAIN,
         flip: bool = False,
     ) -> None:
         super().__init__(start_pos, frames, *groups)

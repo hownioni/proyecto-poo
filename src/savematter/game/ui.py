@@ -3,7 +3,7 @@ from __future__ import annotations
 import pygame
 
 from savematter.sprites.sprites import AnimatedSprite
-from savematter.utils.settings import Z_LAYERS
+from savematter.utils.settings import ZLayers
 from savematter.utils.timer import Timer
 from savematter.utils.typing import TYPE_CHECKING, cast
 
@@ -12,23 +12,21 @@ if TYPE_CHECKING:
     from pygame.font import Font
 
     from savematter.sprites.sprites import Sprite
+    from savematter.utils.typing import AnimationDict, FrameList
 
 
 class UI:
     def __init__(
         self,
         fonts: dict[str, Font],
-        frames: dict[
-            str,
-            Surface | list[Surface] | dict[str, Surface] | dict[str, list[Surface]],
-        ],
+        frames: dict[str, Surface | FrameList | dict[str, Surface] | AnimationDict],
     ) -> None:
-        self.display_surf = pygame.display.get_surface()
+        self.screen = pygame.display.get_surface()
         self.sprites = pygame.sprite.Group()
         self.fonts = fonts
 
         # Health / Hearts
-        self.heart_frames = cast("list[Surface]", frames["heart"])
+        self.heart_frames = cast("FrameList", frames["heart"])
         self.heart_surf_width = self.heart_frames[0].get_width()
         self.heart_padding = 5
 
@@ -49,7 +47,7 @@ class UI:
 
     # Coins
     def display_text(self) -> None:
-        if self.display_surf is None:
+        if self.screen is None:
             raise TypeError("Display surface is empty")
 
         if self.coin_timer.active:
@@ -57,24 +55,24 @@ class UI:
                 str(self.coin_amount), False, "#33323d"
             )
             text_rect = text_surf.get_frect(topleft=(16, 34))
-            self.display_surf.blit(text_surf, text_rect)
+            self.screen.blit(text_surf, text_rect)
 
             coin_rect = self.coin_surf.get_frect(center=text_rect.bottomleft).move(
                 0, -6
             )
-            self.display_surf.blit(self.coin_surf, coin_rect)
+            self.screen.blit(self.coin_surf, coin_rect)
 
     def show_coins(self, amount: int) -> None:
         self.coin_amount = amount
         self.coin_timer.activate()
 
     def update(self, dt: float) -> None:
-        if self.display_surf is None:
+        if self.screen is None:
             raise TypeError("Display surface is empty")
 
         self.coin_timer.update()
         self.sprites.update(dt)
-        self.sprites.draw(self.display_surf)
+        self.sprites.draw(self.screen)
         self.display_text()
 
 
@@ -82,9 +80,9 @@ class Heart(AnimatedSprite):
     def __init__(
         self,
         pos: tuple[float, float],
-        frames: list[Surface],
+        frames: FrameList,
         *groups: pygame.sprite.Group,
-        z: int = Z_LAYERS["ui"],
+        z: int = ZLayers.UI,
     ) -> None:
         super().__init__(pos, frames, *groups, z=z)
         self.timers = {"heart_anim_block": Timer(2000, random=True, lower_bound=500)}

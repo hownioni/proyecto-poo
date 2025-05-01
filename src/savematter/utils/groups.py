@@ -10,7 +10,7 @@ from savematter.utils.settings import (
     TILE_SIZE,
     WINDOW_H,
     WINDOW_W,
-    Z_LAYERS,
+    ZLayers,
 )
 from savematter.utils.timer import Timer
 from savematter.utils.typing import TYPE_CHECKING, Vector2, cast
@@ -19,6 +19,7 @@ if TYPE_CHECKING:
     from pygame import Surface
 
     from savematter.game.data import Data
+    from savematter.utils.typing import FrameList
 
 
 class WorldSprites(pygame.sprite.Group):
@@ -40,11 +41,8 @@ class WorldSprites(pygame.sprite.Group):
             if sprite.rect is None or sprite.image is None:
                 raise TypeError("Sprite rect or image are empty")
 
-            if sprite.z < Z_LAYERS["main"]:
-                if (
-                    sprite.z == Z_LAYERS["path"]
-                    and sprite.level > self.data.unlocked_level
-                ):
+            if sprite.z < ZLayers.MAIN:
+                if sprite.z == ZLayers.PATH and sprite.level > self.data.unlocked_level:
                     pass
                 else:
                     offset_pos = sprite.rect.topleft + self.offset
@@ -55,7 +53,7 @@ class WorldSprites(pygame.sprite.Group):
             if sprite.rect is None or sprite.image is None:
                 raise TypeError("Sprite rect or image are empty")
 
-            if sprite.z == Z_LAYERS["main"]:
+            if sprite.z == ZLayers.MAIN:
                 icon_offset = Vector2(0, -28) if hasattr(sprite, "icon") else Vector2()
                 offset_pos = sprite.rect.topleft + self.offset + icon_offset
                 self.screen.blit(sprite.image, offset_pos)
@@ -66,7 +64,7 @@ class AllSprites(pygame.sprite.Group):
         self,
         level_width: int,
         level_height: int,
-        clouds: dict[str, Surface | list[Surface]],
+        clouds: dict[str, Surface | FrameList],
         bg_tile: Surface | None = None,
         top_limit: int = 0,
         horizon_line: int = 0,
@@ -94,7 +92,7 @@ class AllSprites(pygame.sprite.Group):
                     Sprite((x, y), bg_tile, self, z=-1)
         else:  # Sky
             self.large_cloud = cast("Surface", clouds["large"])
-            self.small_clouds = cast("list[Surface]", clouds["small"])
+            self.small_clouds = cast("FrameList", clouds["small"])
             self.cloud_direction = -1
 
             # Large cloud

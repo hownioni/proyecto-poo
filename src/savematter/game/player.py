@@ -11,20 +11,22 @@ from savematter.utils.typing import TYPE_CHECKING, Vector2
 
 if TYPE_CHECKING:
     from pygame.mixer import Sound
+    from pygame.sprite import Group
 
     from savematter.sprites.sprites import MovingSprite, Sprite
+    from savematter.utils.typing import AnimationDict
 
 
 class Player(StateAnimatedSprite):
     def __init__(
         self,
         pos: tuple[int, int],
-        frames: dict[str, list[pygame.Surface]],
+        frames: AnimationDict,
         data: Data,
         audio_files: dict[str, Sound],
-        collision_sprites: pygame.sprite.Group,
-        semi_collision_sprites: pygame.sprite.Group,
-        *groups: pygame.sprite.Group,
+        collision_sprites: Group,
+        semi_collision_sprites: Group,
+        *groups: Group,
     ) -> None:
         super().__init__(pos, "idle", frames, *groups)
         self.data = data

@@ -1,3 +1,12 @@
+"""
+Level scene manager for platformer gameplay.
+Handles:
+- Tilemap rendering (TMX)
+- Physics/collisions
+- Enemy/object spawning
+- Player interactions
+"""
+
 from __future__ import annotations
 
 from random import uniform
@@ -19,8 +28,9 @@ from savematter.utils.groups import AllSprites
 from savematter.utils.settings import (
     ANIM_SPEED,
     TILE_SIZE,
-    Z_LAYERS,
     GameState,
+    LevelLayers,
+    ZLayers,
 )
 from savematter.utils.typing import TYPE_CHECKING, cast
 
@@ -30,7 +40,7 @@ if TYPE_CHECKING:
     from pytmx.pytmx import TiledMap, TiledObject
     from pytmx.pytmx import TiledObjectGroup as TiledObjectGroup
 
-    from savematter.utils.typing import SwitchState
+    from savematter.utils.typing import AnimationDict, FrameList, SwitchState
 
 
 class Level:
@@ -39,13 +49,12 @@ class Level:
         tmx_map: TiledMap,
         data: Data,
         level_frames: dict[
-            str,
-            Surface | list[Surface] | dict[str, Surface] | dict[str, list[Surface]],
+            str, Surface | FrameList | dict[str, Surface] | AnimationDict
         ],
         audio_files: dict[str, Sound],
         switch_state: SwitchState,
     ) -> None:
-        self.screen: Surface | None = pygame.display.get_surface()
+        self.screen = pygame.display.get_surface()
         self.data = data
         self.switch_state = switch_state
 
@@ -53,7 +62,7 @@ class Level:
         self.level_width = tmx_map.width * TILE_SIZE
         self.level_height = tmx_map.height * TILE_SIZE
         tmx_level_properties = cast(
-            "TiledObjectGroup", tmx_map.get_layer_by_name("Data")
+            "TiledObjectGroup", tmx_map.get_layer_by_name(LevelLayers.DATA)
         )[0].properties
         self.level_unlock: int = tmx_level_properties["level_unlock"]
         bg_tile = (
@@ -100,28 +109,31 @@ class Level:
         self,
         tmx_map: TiledMap,
         level_frames: dict[
-            str,
-            Surface | list[Surface] | dict[str, Surface] | dict[str, list[Surface]],
+            str, Surface | FrameList | dict[str, Surface] | AnimationDict
         ],
         audio_files: dict[str, Sound],
     ) -> None:
         # Tiles
-        for layer in ["BG", "Terrain", "FG", "Platforms"]:
+        for layer in [
+            LevelLayers.BG,
+            LevelLayers.TERRAIN,
+            LevelLayers.FG,
+            LevelLayers.PLATFORMS,
+        ]:
             for x, y, surf in tmx_map.get_layer_by_name(layer).tiles():
                 groups = []
                 groups.append(self.all_sprites)
-                if layer == "Terrain":
-                    groups.append(self.collision_sprites)
-                if layer == "Platforms":
-                    groups.append(self.semi_collision_sprites)
+                match layer:
+                    case LevelLayers.TERRAIN:
+                        groups.append(self.collision_sprites)
+                    case LevelLayers.PLATFORMS:
+                        groups.append(self.semi_collision_sprites)
 
                 match layer:
-                    case "BG":
-                        z = Z_LAYERS["bg tiles"]
-                    case "FG":
-                        z = Z_LAYERS["bg tiles"]
+                    case LevelLayers.BG | LevelLayers.FG:
+                        z = ZLayers.BG_TILES
                     case _:
-                        z = Z_LAYERS["main"]
+                        z = ZLayers.MAIN
 
                 Sprite(
                     (x * TILE_SIZE, y * TILE_SIZE),
@@ -132,7 +144,9 @@ class Level:
 
         obj: TiledObject
         # Static objects
-        for obj in cast("TiledObjectGroup", tmx_map.get_layer_by_name("BG details")):
+        for obj in cast(
+            "TiledObjectGroup", tmx_map.get_layer_by_name(LevelLayers.BG_DETAILS)
+        ):
             if obj.name is None:
                 raise TypeError("Object name is empty")
 
@@ -141,7 +155,7 @@ class Level:
                     if obj.image is None:
                         raise TypeError("Object image is empty")
 
-                    z = Z_LAYERS["bg tiles"]
+                    z = ZLayers.BG_TILES
 
                     Sprite(
                         (obj.x, obj.y),
@@ -152,19 +166,21 @@ class Level:
                 case _:
                     AnimatedSprite(
                         (obj.x, obj.y),
-                        cast("list[Surface]", level_frames[obj.name]),
+                        cast("FrameList", level_frames[obj.name]),
                         self.all_sprites,
                         z=z,
                     )
                     if obj.name == "candle":
                         AnimatedSprite(
                             (obj.x - 20, obj.y - 20),
-                            cast("list[Surface]", level_frames["candle_light"]),
+                            cast("FrameList", level_frames["candle_light"]),
                             self.all_sprites,
                             z=z,
                         )
 
-        for obj in cast("TiledObjectGroup", tmx_map.get_layer_by_name("Objects")):
+        for obj in cast(
+            "TiledObjectGroup", tmx_map.get_layer_by_name(LevelLayers.OBJECTS)
+        ):
             if obj.name is None:
                 raise TypeError("Object name is empty")
 
@@ -175,7 +191,7 @@ class Level:
 
                     self.player = Player(
                         (obj.x, obj.y),
-                        cast("dict[str, list[Surface]]", level_frames["player"]),
+                        cast("AnimationDict", level_frames["player"]),
                         self.data,
                         audio_files,
                         self.collision_sprites,
@@ -194,18 +210,16 @@ class Level:
                 case "floor_spike":
                     FloorSpike(
                         (obj.x, obj.y),
-                        cast("list[Surface]", level_frames["floor_spike"]),
+                        cast("FrameList", level_frames["floor_spike"]),
                         obj.properties["inverted"],
                         *(self.all_sprites, self.damage_sprites),
                     )
                 case _:
                     # Frames
                     frames = (
-                        cast("list[Surface]", level_frames[obj.name])
+                        cast("FrameList", level_frames[obj.name])
                         if "palm" not in obj.name
-                        else cast("dict[str, list[Surface]]", level_frames["palms"])[
-                            obj.name
-                        ]
+                        else cast("AnimationDict", level_frames["palms"])[obj.name]
                     )
 
                     # Groups
@@ -217,11 +231,7 @@ class Level:
                         groups.append(self.damage_sprites)
 
                     # Z index
-                    z = (
-                        Z_LAYERS["main"]
-                        if "bg" not in obj.name
-                        else Z_LAYERS["bg details"]
-                    )
+                    z = ZLayers.MAIN if "bg" not in obj.name else ZLayers.BG_DETAILS
 
                     # Anim speed
                     anim_speed = (
@@ -241,7 +251,7 @@ class Level:
 
         # Moving objects
         for obj in cast(
-            "TiledObjectGroup", tmx_map.get_layer_by_name("Moving Objects")
+            "TiledObjectGroup", tmx_map.get_layer_by_name(LevelLayers.MOVING_OBJS)
         ):
             if obj.name == "spike":
                 Spike(
@@ -262,13 +272,13 @@ class Level:
                         obj.properties["start_angle"],
                         obj.properties["end_angle"],
                         self.all_sprites,
-                        z=Z_LAYERS["bg details"],
+                        z=ZLayers.BG_DETAILS,
                     )
             else:
                 if obj.name is None:
                     raise TypeError("Object name is empty")
 
-                frames = cast("list[Surface]", level_frames[obj.name])
+                frames = cast("FrameList", level_frames[obj.name])
                 groups = (
                     (self.all_sprites, self.semi_collision_sprites)
                     if obj.properties["platform"]
@@ -312,7 +322,7 @@ class Level:
                                 (x, y),
                                 cast("Surface", level_frames["saw_chain"]),
                                 self.all_sprites,
-                                z=Z_LAYERS["bg details"],
+                                z=ZLayers.BG_DETAILS,
                             )
                     else:
                         x = (
@@ -325,23 +335,25 @@ class Level:
                                 (x, y),
                                 cast("Surface", level_frames["saw_chain"]),
                                 self.all_sprites,
-                                z=Z_LAYERS["bg details"],
+                                z=ZLayers.BG_DETAILS,
                             )
 
         # Enemies
-        for obj in cast("TiledObjectGroup", tmx_map.get_layer_by_name("Enemies")):
+        for obj in cast(
+            "TiledObjectGroup", tmx_map.get_layer_by_name(LevelLayers.ENEMIES)
+        ):
             match obj.name:
                 case "tooth":
                     Tooth(
                         (obj.x, obj.y),
-                        cast("list[Surface]", level_frames["tooth"]),
+                        cast("FrameList", level_frames["tooth"]),
                         self.collision_sprites,
                         *(self.all_sprites, self.damage_sprites, self.tooth_sprites),
                     )
                 case "shell":
                     Shell(
                         (obj.x, obj.y),
-                        cast("dict[str, list[Surface]]", level_frames["shell"]),
+                        cast("AnimationDict", level_frames["shell"]),
                         obj.properties["reverse"],
                         self.player,
                         self.create_perl,
@@ -349,20 +361,24 @@ class Level:
                     )
 
         # Items
-        for obj in cast("TiledObjectGroup", tmx_map.get_layer_by_name("Items")):
+        for obj in cast(
+            "TiledObjectGroup", tmx_map.get_layer_by_name(LevelLayers.ITEMS)
+        ):
             if obj.name is None:
                 raise TypeError("Object name is empty")
 
             Item(
                 (obj.x + TILE_SIZE / 2, obj.y + TILE_SIZE / 2),
-                cast("dict[str, list[Surface]]", level_frames["items"])[obj.name],
+                cast("AnimationDict", level_frames["items"])[obj.name],
                 obj.name,
                 self.data,
                 *(self.all_sprites, self.item_sprites),
             )
 
         # Water
-        for obj in cast("TiledObjectGroup", tmx_map.get_layer_by_name("Water")):
+        for obj in cast(
+            "TiledObjectGroup", tmx_map.get_layer_by_name(LevelLayers.WATER)
+        ):
             rows = int(obj.height / TILE_SIZE)
             cols = int(obj.width / TILE_SIZE)
 
@@ -374,16 +390,16 @@ class Level:
                     if row == 0:
                         AnimatedSprite(
                             (x, y),
-                            cast("list[Surface]", level_frames["water_top"]),
+                            cast("FrameList", level_frames["water_top"]),
                             self.all_sprites,
-                            z=Z_LAYERS["water"],
+                            z=ZLayers.WATER,
                         )
                     else:
                         Sprite(
                             (x, y),
                             cast("Surface", level_frames["water_body"]),
                             self.all_sprites,
-                            z=Z_LAYERS["water"],
+                            z=ZLayers.WATER,
                         )
 
     def create_perl(self, pos: tuple[float, float], direction: int) -> None:
