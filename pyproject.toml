@@ -1,13 +1,15 @@
 [build-system]
-build-backend = "setuptools.build_meta"
+build-backend = "hatchling.build"
 
-requires = [ "setuptools>=70.0.3" ]
+requires = [ "hatchling" ]
 
 [project]
-name = "save-the-matter"
+name = "savematter"
 version = "0.1.0"
 description = "Proyecto para la materia de Programación Orientada a Objetos"
-readme = "README.md"
+authors = [
+  { name = "Sergio Luna", email = "luna.sergiorawr@gmail.com" },
+]
 requires-python = ">=3.9"
 classifiers = [
   "Programming Language :: Python :: 3 :: Only",
@@ -18,11 +20,11 @@ classifiers = [
   "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-  "pygame-ce",
-  "pytmx @ git+https://github.com/bitcraft/pytmx",
+  "pygame-ce>=2.5.3",
+  "pytmx",
 ]
 
-scripts.savematter = "savematter.main:main" # Makes the game runnable via CLI
+scripts.savematter = "savematter.main:main"
 
 [tool.setuptools]
 include-package-data = true
@@ -32,3 +34,9 @@ where = [ "src" ]
 
 [tool.setuptools.package-data]
 savematter = [ "assets/**/*" ]
+
+[tool.uv.sources]
+pytmx = { git = "https://github.com/bitcraft/pytmx" }
+
+[tool.basedpyright]
+allowedUntypedLibraries = [ "pytmx" ]
