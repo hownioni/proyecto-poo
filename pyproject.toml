@@ -39,4 +39,5 @@ savematter = [ "assets/**/*" ]
 pytmx = { git = "https://github.com/bitcraft/pytmx" }
 
 [tool.basedpyright]
-allowedUntypedLibraries = [ "pytmx" ]
+allowedUntypedLibraries = [ "pytmx", "pygame.sprite" ]
+typeCheckingMode = "standard"

@@ -4,9 +4,9 @@ from random import randint
 
 import pygame
 
+from savematter.sprites.groups import WorldSprites
 from savematter.sprites.overworld import Node, PlayerIcon, WalkPath
 from savematter.sprites.sprites import AnimatedSprite, Sprite
-from savematter.utils.groups import WorldSprites
 from savematter.utils.settings import (
     TILE_SIZE,
     GameState,
@@ -263,4 +263,4 @@ class Overworld:
         self.input()
         self.get_curr_node()
         self.all_sprites.update(dt)
-        self.all_sprites.draw(self.player_icon.rect.center, dt)
+        self.all_sprites.draw_camera(self.player_icon.rect.center)

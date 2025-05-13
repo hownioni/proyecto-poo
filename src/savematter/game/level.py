@@ -16,6 +16,7 @@ import pygame
 from savematter.game.data import Data
 from savematter.game.player import Player
 from savematter.sprites.enemies import Pearl, Shell, Tooth
+from savematter.sprites.groups import AllSprites
 from savematter.sprites.objects import FloorSpike, Spike
 from savematter.sprites.sprites import (
     AnimatedSprite,
@@ -24,7 +25,6 @@ from savematter.sprites.sprites import (
     ParticleEffectSprite,
     Sprite,
 )
-from savematter.utils.groups import AllSprites
 from savematter.utils.settings import (
     ANIM_SPEED,
     TILE_SIZE,
@@ -150,12 +150,11 @@ class Level:
             if obj.name is None:
                 raise TypeError("Object name is empty")
 
+            z = ZLayers.BG_TILES
             match obj.name:
                 case "static":
                     if obj.image is None:
                         raise TypeError("Object image is empty")
-
-                    z = ZLayers.BG_TILES
 
                     Sprite(
                         (obj.x, obj.y),
@@ -535,4 +534,4 @@ class Level:
         self.all_sprites.update(dt)
         self.collisions()
 
-        self.all_sprites.draw(self.player.hitbox.center, dt)
+        self.all_sprites.draw_camera(self.player.hitbox.center, dt)

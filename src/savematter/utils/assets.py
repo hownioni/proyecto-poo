@@ -12,32 +12,22 @@ from savematter.utils.support import (
 from savematter.utils.typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from pygame import Surface
     from pygame.font import Font
     from pygame.mixer import Sound
     from pytmx.pytmx import TiledMap
 
-    from savematter.utils.typing import AnimationDict, FrameList
+    from savematter.utils.typing import SurfCollection
 
 
 class AssetManager:
     def __init__(self) -> None:
-        self.level_frames: dict[
-            str,
-            Surface | FrameList | dict[str, Surface] | AnimationDict,
-        ] = {}
+        self.level_frames: dict[str, SurfCollection] = {}
         self.fonts: dict[str, Font] = {}
-        self.ui_frames: dict[
-            str,
-            Surface | FrameList | dict[str, Surface] | AnimationDict,
-        ] = {}
-        self.overworld_frames: dict[
-            str,
-            Surface | FrameList | dict[str, Surface] | AnimationDict,
-        ] = {}
+        self.ui_frames: dict[str, SurfCollection] = {}
+        self.overworld_frames: dict[str, SurfCollection] = {}
         self.audio_files: dict[str, Sound] = {}
         self.music_files: dict[str, Sound] = {}
-        self.tmx_files: dict[str, dict[int, TiledMap] | TiledMap] = {}
+        self.tmx_files: dict[str, dict[int, TiledMap]] = {}
         self.load_assets()
 
     def load_assets(self) -> None:
@@ -104,7 +94,9 @@ class AssetManager:
             6: import_tmx("data", "levels", "6"),
         }
 
-        tmx_overworld = import_tmx("data", "overworld", "overworld")
+        tmx_overworld: dict[int, TiledMap] = {
+            0: import_tmx("data", "overworld", "overworld")
+        }
 
         self.tmx_files["maps"] = tmx_maps
         self.tmx_files["overworld"] = tmx_overworld

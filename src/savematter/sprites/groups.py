@@ -29,7 +29,7 @@ class WorldSprites(pygame.sprite.Group):
         self.data = data
         self.offset = Vector2()
 
-    def draw(self, target_pos: tuple[float, float], dt: float) -> None:
+    def draw_camera(self, target_pos: tuple[float, float]) -> None:
         if self.screen is None:
             raise TypeError("Display surface is empty")
 
@@ -141,7 +141,7 @@ class AllSprites(pygame.sprite.Group):
         surf = choice(self.small_clouds)
         Cloud(pos, surf, self)
 
-    def draw(self, target_pos: tuple[float, float], dt: float) -> None:
+    def draw_camera(self, target_pos: tuple[float, float], dt: float) -> None:
         if self.screen is None:
             raise TypeError("Display surface is empty")
 

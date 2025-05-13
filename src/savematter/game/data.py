@@ -15,6 +15,8 @@ class Data:
 
         self.unlocked_level = 5
         self.current_level = 5
+        self.unlocked_overworld = 0
+        self.current_overworld = 0
 
     @property
     def health(self) -> int:

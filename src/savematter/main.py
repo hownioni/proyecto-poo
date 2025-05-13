@@ -16,7 +16,7 @@ from savematter.utils.settings import (
     WINDOW_W,
     GameState,
 )
-from savematter.utils.typing import TYPE_CHECKING, cast
+from savematter.utils.typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from pytmx.pytmx import TiledMap as TiledMap
@@ -39,8 +39,8 @@ class Game:
         self.overworld_frames = self.assets.overworld_frames
         self.audio_files = self.assets.audio_files
         self.music_files = self.assets.music_files
-        self.tmx_maps = cast("dict[int, TiledMap]", self.assets.tmx_files["maps"])
-        self.tmx_overworld = cast("TiledMap", self.assets.tmx_files["overworld"])
+        self.tmx_maps = self.assets.tmx_files["maps"]
+        self.tmx_overworld = self.assets.tmx_files["overworld"]
 
         self.ui = UI(self.fonts, self.ui_frames)
         self.data = Data(self.ui)
@@ -88,7 +88,7 @@ class Game:
                 elif unlock is not None:
                     self.data.unlocked_level = unlock
                 self.current_state = Overworld(
-                    self.tmx_overworld,
+                    self.tmx_overworld[self.data.current_overworld],
                     self.data,
                     self.overworld_frames,
                     self.switch_state,
@@ -97,8 +97,6 @@ class Game:
     def run(self) -> None:
         while True:
             dt = self.clock.tick(FPS) / 1000
-            max_dt = 0.1
-            dt = min(dt, max_dt)
             self.handle_events()
 
             self.check_game_over()
@@ -127,6 +125,3 @@ class Game:
 def main():
     game = Game()
     game.run()
-
-
-main()
